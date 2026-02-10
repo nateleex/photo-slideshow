@@ -17,6 +17,13 @@ enum PhotoFitMode: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+enum PhotoSource: String, CaseIterable, Identifiable {
+    case photosLibrary = "Photos Library"
+    case customFolder = "Custom Folder"
+
+    var id: String { rawValue }
+}
+
 @Observable
 final class AppSettings {
     static let shared = AppSettings()
@@ -42,6 +49,12 @@ final class AppSettings {
     var shuffle: Bool {
         didSet { UserDefaults.standard.set(shuffle, forKey: "shuffle") }
     }
+    var photoSource: PhotoSource {
+        didSet { UserDefaults.standard.set(photoSource.rawValue, forKey: "photoSource") }
+    }
+    var customFolderPath: String? {
+        didSet { UserDefaults.standard.set(customFolderPath, forKey: "customFolderPath") }
+    }
 
     private init() {
         let defaults = UserDefaults.standard
@@ -53,6 +66,7 @@ final class AppSettings {
             "windowOpacity": 1.0,
             "fitMode": PhotoFitMode.fit.rawValue,
             "shuffle": true,
+            "photoSource": PhotoSource.photosLibrary.rawValue,
         ])
 
         interval = defaults.double(forKey: "interval")
@@ -62,5 +76,7 @@ final class AppSettings {
         windowOpacity = defaults.double(forKey: "windowOpacity")
         fitMode = PhotoFitMode(rawValue: defaults.string(forKey: "fitMode") ?? "") ?? .fit
         shuffle = defaults.bool(forKey: "shuffle")
+        photoSource = PhotoSource(rawValue: defaults.string(forKey: "photoSource") ?? "") ?? .photosLibrary
+        customFolderPath = defaults.string(forKey: "customFolderPath")
     }
 }

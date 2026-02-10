@@ -5,6 +5,7 @@ final class WindowManager {
     private var panel: FloatingPanel?
     private let state: SlideshowState
     private let settings = AppSettings.shared
+    private var closeObserver: Any?
 
     init(state: SlideshowState) {
         self.state = state
@@ -17,17 +18,27 @@ final class WindowManager {
         }
 
         let screenFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 800, height: 600)
-        let width: CGFloat = 480
-        let height: CGFloat = 360
-        let x = screenFrame.maxX - width - 40
-        let y = screenFrame.maxY - height - 40
+        let width: CGFloat = min(800, screenFrame.width * 0.6)
+        let height: CGFloat = width * 9.0 / 16.0
+        let x = screenFrame.midX - width / 2
+        let y = screenFrame.midY - height / 2
         let rect = NSRect(x: x, y: y, width: width, height: height)
 
         let panel = FloatingPanel(contentRect: rect)
 
         let rootView = SlideshowView(state: state)
         let hostingView = NSHostingView(rootView: rootView)
+        hostingView.sizingOptions = []
         panel.contentView = hostingView
+
+        closeObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: panel,
+            queue: .main
+        ) { [weak self] _ in
+            self?.panel = nil
+            self?.closeObserver = nil
+        }
 
         panel.makeKeyAndOrderFront(nil)
         self.panel = panel
@@ -39,7 +50,6 @@ final class WindowManager {
 
     func close() {
         panel?.close()
-        panel = nil
     }
 
     var window: NSWindow? { panel }

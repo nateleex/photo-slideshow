@@ -1,11 +1,36 @@
 import SwiftUI
+import AppKit
 
 struct SettingsView: View {
     @Bindable var settings = AppSettings.shared
     var onWindowUpdate: (() -> Void)?
+    var onSourceChange: (() -> Void)?
 
     var body: some View {
         Form {
+            Section("Photo Source") {
+                Picker("Source", selection: $settings.photoSource) {
+                    ForEach(PhotoSource.allCases) { source in
+                        Text(source.rawValue).tag(source)
+                    }
+                }
+                .onChange(of: settings.photoSource) { _, _ in onSourceChange?() }
+
+                if settings.photoSource == .customFolder {
+                    HStack {
+                        Text(settings.customFolderPath ?? "No folder selected")
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                            .foregroundStyle(.secondary)
+                            .font(.caption)
+                        Spacer()
+                        Button("Choose...") {
+                            chooseFolder()
+                        }
+                    }
+                }
+            }
+
             Section("Playback") {
                 HStack {
                     Text("Interval")
@@ -33,7 +58,7 @@ struct SettingsView: View {
 
                 HStack {
                     Text("Opacity")
-                    Slider(value: $settings.windowOpacity, in: 0.3...1.0, step: 0.05)
+                    Slider(value: $settings.windowOpacity, in: 0.3...1.0)
                     Text("\(Int(settings.windowOpacity * 100))%")
                         .monospacedDigit()
                         .frame(width: 40, alignment: .trailing)
@@ -50,6 +75,19 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 320, height: 360)
+        .frame(width: 320, height: 480)
+    }
+
+    private func chooseFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.message = "Choose a folder containing photos"
+
+        if panel.runModal() == .OK, let url = panel.url {
+            settings.customFolderPath = url.path
+            onSourceChange?()
+        }
     }
 }

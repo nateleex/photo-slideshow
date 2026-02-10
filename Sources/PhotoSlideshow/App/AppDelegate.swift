@@ -6,21 +6,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var menuBarManager: MenuBarManager!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Hide from Dock, run as menu bar app
+        NSApp.setActivationPolicy(.accessory)
+
         windowManager = WindowManager(state: state)
         menuBarManager = MenuBarManager(state: state, windowManager: windowManager)
 
         menuBarManager.setupMainMenu()
+        menuBarManager.setupStatusBar()
         windowManager.showWindow()
 
-        state.checkAuthorization()
-        if state.isAuthorized {
-            state.play()
-        }
+        state.loadInitialSource()
 
-        // Monitor for Escape key
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+        // Escape closes window (not quit)
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             if event.keyCode == 53 { // Escape
-                NSApp.terminate(nil)
+                self?.windowManager.close()
                 return nil
             }
             return event
@@ -28,7 +29,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
+        false
+    }
+
+    @objc func showSlideshow(_ sender: Any?) {
+        windowManager.showWindow()
     }
 
     @objc func openSettings(_ sender: Any?) {

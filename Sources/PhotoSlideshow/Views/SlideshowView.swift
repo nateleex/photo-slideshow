@@ -8,9 +8,11 @@ struct SlideshowView: View {
 
     var body: some View {
         ZStack {
-            Color.black
+            if state.currentImage == nil {
+                Color.black.opacity(0.7)
+            }
 
-            if !state.isAuthorized {
+            if state.needsAuthorization {
                 PermissionView(state: state)
             } else if let image = state.currentImage {
                 photoView(image)
@@ -19,14 +21,27 @@ struct SlideshowView: View {
                     .controlSize(.large)
                     .colorScheme(.dark)
             } else if !state.hasPhotos {
-                Text("No photos found")
+                Text(state.noPhotosMessage)
                     .foregroundStyle(.secondary)
                     .font(.title2)
             }
 
-            if state.isAuthorized && state.hasPhotos {
+            if !state.needsAuthorization && state.hasPhotos {
                 ControlsOverlay(state: state, isHovering: isHovering)
             }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                .opacity(isHovering ? 1 : 0)
+        )
+        .ignoresSafeArea()
+        .contentShape(Rectangle())
+        .onTapGesture {
+            guard state.hasPhotos else { return }
+            state.togglePlayPause()
+            state.restartTimerIfPlaying()
         }
         .onHover { hovering in
             withAnimation(.easeInOut(duration: 0.2)) {

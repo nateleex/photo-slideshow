@@ -5,10 +5,25 @@ final class MenuBarManager {
     private let state: SlideshowState
     private let windowManager: WindowManager
     private var settingsWindow: NSWindow?
+    private var statusItem: NSStatusItem?
 
     init(state: SlideshowState, windowManager: WindowManager) {
         self.state = state
         self.windowManager = windowManager
+    }
+
+    func setupStatusBar() {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem?.button {
+            button.image = NSImage(systemSymbolName: "photo.fill", accessibilityDescription: "Photo Slideshow")
+        }
+
+        let menu = NSMenu()
+        menu.addItem(withTitle: "Show Slideshow", action: #selector(AppDelegate.showSlideshow(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: "Settings...", action: #selector(AppDelegate.openSettings(_:)), keyEquivalent: ",")
+        menu.addItem(.separator())
+        menu.addItem(withTitle: "Quit Photo Slideshow", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        statusItem?.menu = menu
     }
 
     func setupMainMenu() {
@@ -64,12 +79,17 @@ final class MenuBarManager {
             return
         }
 
-        let view = SettingsView { [weak self] in
-            self?.windowManager.updateWindowAppearance()
-        }
+        let view = SettingsView(
+            onWindowUpdate: { [weak self] in
+                self?.windowManager.updateWindowAppearance()
+            },
+            onSourceChange: { [weak self] in
+                self?.state.reload()
+            }
+        )
         let hostingView = NSHostingView(rootView: view)
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 360),
+            contentRect: NSRect(x: 0, y: 0, width: 320, height: 480),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
