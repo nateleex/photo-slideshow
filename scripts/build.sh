@@ -64,6 +64,7 @@ swiftc \
 
 echo "==> Assembling app bundle..."
 cp "$PROJECT_DIR/resources/Info.plist" "$CONTENTS/Info.plist"
+cp "$PROJECT_DIR/resources/AppIcon.icns" "$RESOURCES/AppIcon.icns"
 
 echo "==> Ad-hoc signing..."
 codesign --force --sign - \

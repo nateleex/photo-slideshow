@@ -7,7 +7,9 @@
     <key>CFBundleDisplayName</key>
     <string>Photo Slideshow</string>
     <key>CFBundleIdentifier</key>
-    <string>com.nate.photoslideshow</string>
+    <string>com.liziran.photoslideshow</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundleShortVersionString</key>

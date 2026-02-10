@@ -1,8 +1,18 @@
 # Changelog
 
-## [2026-02-10]
+## [2026-02-10] v1.0.0 — Open Source Release
 
 ### Added
+- README.md with feature overview, install/build instructions, and usage guide
+- MIT License
+- App icon (mountain/sun design, generated via CoreGraphics)
+
+### Changed
+- Bundle identifier changed to `com.liziran.photoslideshow`
+- Removed conflicting `setActivationPolicy(.regular)` from main.swift
+- build.sh now copies AppIcon.icns into app bundle Resources
+
+### Added (earlier)
 - Custom folder photo source: select any folder to use as photo source (recursive scan)
 - Photo source picker in Settings (Photos Library / Custom Folder)
 - Menu bar (status bar) app mode: app runs as a status bar icon instead of Dock app
