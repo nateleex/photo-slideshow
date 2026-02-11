@@ -32,7 +32,7 @@ struct SlideshowView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(
-            RoundedRectangle(cornerRadius: 4)
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
                 .stroke(Color.white.opacity(0.3), lineWidth: 1)
                 .opacity(isHovering ? 1 : 0)
         )
@@ -60,9 +60,9 @@ struct SlideshowView: View {
         Image(nsImage: image)
             .resizable()
             .aspectRatio(contentMode: settings.fitMode == .fit ? .fit : .fill)
+            .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
             .id(imageID)
             .transition(makeTransition())
-            .clipped()
     }
 
     private var transitionAnimation: Animation? {

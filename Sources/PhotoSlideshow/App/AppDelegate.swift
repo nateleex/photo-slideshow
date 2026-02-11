@@ -6,8 +6,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var menuBarManager: MenuBarManager!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Hide from Dock, run as menu bar app
-        NSApp.setActivationPolicy(.accessory)
+        // Show in menu bar on launch; switches to .accessory when window loses focus
+        NSApp.setActivationPolicy(.regular)
 
         windowManager = WindowManager(state: state)
         menuBarManager = MenuBarManager(state: state, windowManager: windowManager)

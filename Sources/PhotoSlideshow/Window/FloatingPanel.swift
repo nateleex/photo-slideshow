@@ -1,5 +1,9 @@
 import AppKit
 
+extension Notification.Name {
+    static let updateWindowBehavior = Notification.Name("updateWindowBehavior")
+}
+
 final class FloatingPanel: NSPanel {
     private var trackingArea: NSTrackingArea?
 
@@ -27,6 +31,15 @@ final class FloatingPanel: NSPanel {
             standardWindowButton(type)?.alphaValue = 0
         }
 
+        updateWindowBehavior()
+
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(handleUpdateBehavior),
+            name: .updateWindowBehavior, object: nil
+        )
+    }
+
+    @objc private func handleUpdateBehavior() {
         updateWindowBehavior()
     }
 
@@ -77,6 +90,17 @@ final class FloatingPanel: NSPanel {
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
+
+    override func becomeKey() {
+        super.becomeKey()
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    override func resignKey() {
+        super.resignKey()
+        NSApp.setActivationPolicy(.accessory)
+    }
 
     override func keyDown(with event: NSEvent) {
         nextResponder?.keyDown(with: event)

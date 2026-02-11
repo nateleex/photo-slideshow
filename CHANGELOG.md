@@ -3,11 +3,15 @@
 ## [2026-02-10] v1.0.0 — Open Source Release
 
 ### Added
+- Always-on-top pin toggle button in hover controls (circle button next to playback controls)
+- Window activates app on focus, showing menu bar; hides from Dock when unfocused
 - README.md with feature overview, install/build instructions, and usage guide
 - MIT License
 - App icon (mountain/sun design, generated via CoreGraphics)
 
 ### Changed
+- Photos now display with 26pt continuous rounded corners (macOS widget style)
+- Hover border matches photo rounded corners
 - Bundle identifier changed to `com.liziran.photoslideshow`
 - Removed conflicting `setActivationPolicy(.regular)` from main.swift
 - build.sh now copies AppIcon.icns into app bundle Resources
