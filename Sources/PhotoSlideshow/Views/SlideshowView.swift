@@ -4,7 +4,7 @@ struct SlideshowView: View {
     let state: SlideshowState
     private let settings = AppSettings.shared
     @State private var isHovering = false
-    @State private var imageID = UUID()
+    @State private var crossfade: Double = 1.0 // 0 = showing previous, 1 = showing current
 
     var body: some View {
         ZStack {
@@ -14,8 +14,16 @@ struct SlideshowView: View {
 
             if state.needsAuthorization {
                 PermissionView(state: state)
-            } else if let image = state.currentImage {
-                photoView(image)
+            } else if state.currentImage != nil {
+                // Dual-layer crossfade: previous underneath, current on top
+                if let prev = state.previousImage {
+                    photoView(prev)
+                        .opacity(1.0 - crossfade)
+                }
+                if let current = state.currentImage {
+                    photoView(current)
+                        .opacity(crossfade)
+                }
             } else if state.isLoading {
                 ProgressView()
                     .controlSize(.large)
@@ -48,9 +56,20 @@ struct SlideshowView: View {
                 isHovering = hovering
             }
         }
-        .onChange(of: state.currentImage) { _, _ in
-            withAnimation(transitionAnimation) {
-                imageID = UUID()
+        .onChange(of: state.currentImage) { _, newImage in
+            guard newImage != nil else { return }
+            switch settings.transition {
+            case .fade:
+                crossfade = 0
+                withAnimation(.easeInOut(duration: 1.0)) {
+                    crossfade = 1
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.05) {
+                    state.previousImage = nil
+                }
+            default:
+                crossfade = 1
+                state.previousImage = nil
             }
         }
     }
@@ -61,35 +80,6 @@ struct SlideshowView: View {
             .resizable()
             .aspectRatio(contentMode: settings.fitMode == .fit ? .fit : .fill)
             .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-            .id(imageID)
-            .transition(makeTransition())
-    }
-
-    private var transitionAnimation: Animation? {
-        settings.transition == .none ? nil : .easeInOut(duration: 0.5)
-    }
-
-    private func makeTransition() -> AnyTransition {
-        switch settings.transition {
-        case .fade:
-            return .opacity
-        case .slideLeft:
-            return .asymmetric(
-                insertion: .move(edge: .trailing),
-                removal: .move(edge: .leading)
-            )
-        case .slideRight:
-            return .asymmetric(
-                insertion: .move(edge: .leading),
-                removal: .move(edge: .trailing)
-            )
-        case .slideUp:
-            return .asymmetric(
-                insertion: .move(edge: .bottom),
-                removal: .move(edge: .top)
-            )
-        case .none:
-            return .identity
-        }
+            .clipped()
     }
 }

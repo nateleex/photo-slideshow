@@ -3,6 +3,7 @@ import Photos
 
 @Observable
 final class SlideshowState {
+    var previousImage: NSImage?
     var currentImage: NSImage?
     var nextImage: NSImage?
     var isPlaying = false
@@ -43,6 +44,9 @@ final class SlideshowState {
                     self?.loadLibrary()
                     self?.play()
                 }
+                // Bring window back to front after authorization dialog
+                NSApp.setActivationPolicy(.regular)
+                NSApp.activate(ignoringOtherApps: true)
             }
         }
     }
@@ -131,6 +135,7 @@ final class SlideshowState {
         guard photoCount > 0 else { return }
 
         if let preloaded = preloadedNext, let idx = preloadedNextIndex {
+            previousImage = currentImage
             currentImage = preloaded
             currentIndex = idx
             preloadedNext = nil
@@ -147,6 +152,7 @@ final class SlideshowState {
             DispatchQueue.main.async {
                 guard let self else { return }
                 if let image {
+                    self.previousImage = self.currentImage
                     self.currentImage = image
                 } else {
                     self.showNext()
@@ -169,6 +175,7 @@ final class SlideshowState {
             DispatchQueue.main.async {
                 guard let self else { return }
                 if let image {
+                    self.previousImage = self.currentImage
                     self.currentImage = image
                 }
                 self.isLoading = false

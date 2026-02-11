@@ -93,13 +93,7 @@ final class FloatingPanel: NSPanel {
 
     override func becomeKey() {
         super.becomeKey()
-        NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
-    }
-
-    override func resignKey() {
-        super.resignKey()
-        NSApp.setActivationPolicy(.accessory)
     }
 
     override func keyDown(with event: NSEvent) {
