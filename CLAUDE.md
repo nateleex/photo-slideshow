@@ -23,9 +23,10 @@ resources/      - Info.plist, entitlements
 
 ## Commands
 
-- `bash scripts/build.sh` - compile and package .app bundle
+- `bash scripts/build.sh` - compile and package .app bundle (recommended, fast)
 - `bash scripts/run.sh` - build + launch
 - `open build/PhotoSlideshow.app` - run built app
+- `swift build` - SwiftPM build (works but extremely slow for SwiftUI, prefer build.sh)
 
 ## Key Design
 
@@ -49,3 +50,5 @@ resources/      - Info.plist, entitlements
 - Ad-hoc signing: Photos permission resets on each rebuild (limitation of ad-hoc codesign)
 - No Xcode needed - builds with swiftc from Command Line Tools
 - Uses VFS overlay to work around SwiftBridging module redefinition (compiler/SDK version mismatch)
+- Package.swift provided for SwiftPM compatibility; build.sh is the primary/fast build method
+- SwiftPM + SwiftUI + macOS 26 CLT = very slow compilation (>20min vs seconds with swiftc)

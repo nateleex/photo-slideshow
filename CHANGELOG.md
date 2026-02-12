@@ -17,6 +17,14 @@
 ### Fixed
 - Slide transitions now properly animate both incoming and outgoing photos
 - Ken Burns no longer jumps or reverses direction mid-animation
+- Settings button crash on second click (NSWindow released when closed)
+- Async image load race condition after source switch (load generation counter)
+- Infinite retry loop on consecutive image load failures (capped at 10)
+- Controls prev/next buttons now restart slideshow timer
+- Interval clamped to minimum 3s on app launch (old values below 3s corrected)
+- Custom folder image list sorted by path for consistent ordering
+- Photos library auth callback checks current source before loading
+- `swift build` manifest parsing fixed (stale CLT private.swiftinterface removed)
 
 ## [2026-02-10] v1.0.0 — Open Source Release
 

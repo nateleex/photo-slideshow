@@ -41,10 +41,13 @@ final class SlideshowState {
     func requestAuthorization() {
         PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
             DispatchQueue.main.async {
-                self?.authorizationStatus = status
-                if status == .authorized || status == .limited {
-                    self?.loadLibrary()
-                    self?.play()
+                guard let self else { return }
+                self.authorizationStatus = status
+                // Only load Photos library if still on that source
+                if (status == .authorized || status == .limited)
+                    && self.settings.photoSource == .photosLibrary {
+                    self.loadLibrary()
+                    self.play()
                 }
                 // Bring window back to front after authorization dialog
                 NSApp.setActivationPolicy(.regular)
@@ -166,6 +169,8 @@ final class SlideshowState {
                     self.consecutiveFailures += 1
                     if self.consecutiveFailures < 10 {
                         self.showNext()
+                    } else {
+                        self.isLoading = false
                     }
                     return
                 }
