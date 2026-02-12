@@ -36,7 +36,7 @@ resources/      - Info.plist, entitlements
 - Preloads next photo for instant transitions
 - Two-layer alternating architecture: layers A/B with independent Ken Burns and transition animations
 - Transitions: fade, slide (left/right/up/down), zoom, none — driven by direct @State animation
-- Ken Burns: random zoom in/out with linear 8s animation per layer
+- Ken Burns: random zoom in/out with linear 16s animation per layer
 - Hover reveals: traffic light buttons (fade animation), window border, bottom controls
 - Click anywhere to toggle play/pause
 - iCloud photos: network access allowed, failures auto-skipped
@@ -48,4 +48,4 @@ resources/      - Info.plist, entitlements
 - Custom folder mode requires no special permissions
 - Ad-hoc signing: Photos permission resets on each rebuild (limitation of ad-hoc codesign)
 - No Xcode needed - builds with swiftc from Command Line Tools
-- Uses `-Xfrontend -disable-deserialization-safety` to work around compiler/SDK version mismatch
+- Uses VFS overlay to work around SwiftBridging module redefinition (compiler/SDK version mismatch)

@@ -21,6 +21,8 @@ final class SlideshowState {
     private let loader = PhotoLoader()
     private var preloadedNext: NSImage?
     private var preloadedNextIndex: Int?
+    private var loadGeneration = 0
+    private var consecutiveFailures = 0
 
     var hasPhotos: Bool { photoCount > 0 }
     var isAuthorized: Bool { authorizationStatus == .authorized || authorizationStatus == .limited }
@@ -73,12 +75,15 @@ final class SlideshowState {
 
     func reload() {
         pause()
+        loadGeneration += 1
         currentImage = nil
+        previousImage = nil
         currentIndex = -1
         photoCount = 0
         usedIndices.removeAll()
         preloadedNext = nil
         preloadedNextIndex = nil
+        consecutiveFailures = 0
         assets = nil
         folderImageURLs = []
         loadInitialSource()
@@ -109,7 +114,7 @@ final class SlideshowState {
             }
         }
 
-        folderImageURLs = urls
+        folderImageURLs = urls.sorted { $0.path < $1.path }
         photoCount = urls.count
         if photoCount > 0 && currentImage == nil {
             showNext()
@@ -140,6 +145,7 @@ final class SlideshowState {
             currentIndex = idx
             preloadedNext = nil
             preloadedNextIndex = nil
+            consecutiveFailures = 0
             preloadNext()
             return
         }
@@ -147,15 +153,20 @@ final class SlideshowState {
         let index = pickNextIndex()
         currentIndex = index
         isLoading = true
+        let gen = loadGeneration
 
         loadImage(at: index) { [weak self] image in
             DispatchQueue.main.async {
-                guard let self else { return }
+                guard let self, self.loadGeneration == gen else { return }
                 if let image {
                     self.previousImage = self.currentImage
                     self.currentImage = image
+                    self.consecutiveFailures = 0
                 } else {
-                    self.showNext()
+                    self.consecutiveFailures += 1
+                    if self.consecutiveFailures < 10 {
+                        self.showNext()
+                    }
                     return
                 }
                 self.isLoading = false
@@ -170,10 +181,11 @@ final class SlideshowState {
         if index < 0 { index = photoCount - 1 }
         currentIndex = index
         isLoading = true
+        let gen = loadGeneration
 
         loadImage(at: index) { [weak self] image in
             DispatchQueue.main.async {
-                guard let self else { return }
+                guard let self, self.loadGeneration == gen else { return }
                 if let image {
                     self.previousImage = self.currentImage
                     self.currentImage = image
@@ -220,10 +232,12 @@ final class SlideshowState {
     private func preloadNext() {
         guard photoCount > 0 else { return }
         let index = pickNextIndex()
+        let gen = loadGeneration
         loadImage(at: index) { [weak self] image in
             DispatchQueue.main.async {
-                self?.preloadedNext = image
-                self?.preloadedNextIndex = index
+                guard let self, self.loadGeneration == gen else { return }
+                self.preloadedNext = image
+                self.preloadedNextIndex = index
             }
         }
     }

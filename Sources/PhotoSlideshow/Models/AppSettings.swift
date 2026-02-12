@@ -75,7 +75,7 @@ final class AppSettings {
             "kenBurns": false,
         ])
 
-        interval = defaults.double(forKey: "interval")
+        interval = max(3.0, defaults.double(forKey: "interval"))
         transition = TransitionStyle(rawValue: defaults.string(forKey: "transition") ?? "") ?? .fade
         alwaysOnTop = defaults.bool(forKey: "alwaysOnTop")
         showOnAllDesktops = defaults.bool(forKey: "showOnAllDesktops")

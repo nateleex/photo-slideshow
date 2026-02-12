@@ -10,7 +10,10 @@ struct ControlsOverlay: View {
             Spacer()
             HStack(spacing: 12) {
                 HStack(spacing: 20) {
-                    Button(action: { state.showPrevious() }) {
+                    Button(action: {
+                        state.showPrevious()
+                        state.restartTimerIfPlaying()
+                    }) {
                         Image(systemName: "backward.fill")
                             .font(.title2)
                     }
@@ -22,7 +25,10 @@ struct ControlsOverlay: View {
                     }
                     .buttonStyle(.plain)
 
-                    Button(action: { state.showNext() }) {
+                    Button(action: {
+                        state.showNext()
+                        state.restartTimerIfPlaying()
+                    }) {
                         Image(systemName: "forward.fill")
                             .font(.title2)
                     }
