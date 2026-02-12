@@ -34,7 +34,7 @@ struct SettingsView: View {
             Section("Playback") {
                 HStack {
                     Text("Interval")
-                    Slider(value: $settings.interval, in: 1...60, step: 1)
+                    Slider(value: $settings.interval, in: 3...60, step: 1)
                     Text("\(Int(settings.interval))s")
                         .monospacedDigit()
                         .frame(width: 30, alignment: .trailing)
@@ -47,6 +47,7 @@ struct SettingsView: View {
                 }
 
                 Toggle("Shuffle", isOn: $settings.shuffle)
+                Toggle("Ken Burns effect", isOn: $settings.kenBurns)
             }
 
             Section("Display") {

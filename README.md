@@ -17,7 +17,8 @@ We all have thousands of photos but rarely revisit them. Photo Slideshow puts a 
 - **Floating window** — Always-on-top transparent panel, visible across all desktops
 - **Two photo sources** — System Photos Library (via PhotoKit) or any custom folder
 - **Smart shuffle** — Random playback without repeats until all photos are shown
-- **Smooth transitions** — Fade, slide (left/right/up), or instant switch
+- **Smooth transitions** — Fade, slide (left/right/up/down), zoom, or instant switch
+- **Ken Burns effect** — Subtle zoom and pan animation while photos are displayed
 - **Menu bar app** — Lives in the status bar, no Dock icon clutter
 - **Hover controls** — Window buttons and playback controls appear on mouse hover
 - **Customizable** — Interval, opacity, fit mode, transition style, and more
@@ -62,7 +63,8 @@ The app runs as a **menu bar icon** (camera icon in the status bar).
 
 - **Photo Source** — Photos Library or Custom Folder
 - **Interval** — Time between photos (seconds)
-- **Transition** — Fade, Slide Left/Right/Up, None
+- **Transition** — Fade, Slide Left/Right/Up/Down, Zoom, None
+- **Ken Burns** — Subtle zoom and pan effect on/off
 - **Opacity** — Window transparency
 - **Fit Mode** — Fit (letterbox) or Fill (crop)
 - **Always on Top** — Keep window above other windows

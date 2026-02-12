@@ -2,6 +2,7 @@ import AppKit
 
 extension Notification.Name {
     static let updateWindowBehavior = Notification.Name("updateWindowBehavior")
+    static let openSettings = Notification.Name("openSettings")
 }
 
 final class FloatingPanel: NSPanel {

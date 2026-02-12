@@ -5,6 +5,8 @@ enum TransitionStyle: String, CaseIterable, Identifiable {
     case slideLeft = "Slide Left"
     case slideRight = "Slide Right"
     case slideUp = "Slide Up"
+    case slideDown = "Slide Down"
+    case zoom = "Zoom"
     case none = "None"
 
     var id: String { rawValue }
@@ -55,6 +57,9 @@ final class AppSettings {
     var customFolderPath: String? {
         didSet { UserDefaults.standard.set(customFolderPath, forKey: "customFolderPath") }
     }
+    var kenBurns: Bool {
+        didSet { UserDefaults.standard.set(kenBurns, forKey: "kenBurns") }
+    }
 
     private init() {
         let defaults = UserDefaults.standard
@@ -67,6 +72,7 @@ final class AppSettings {
             "fitMode": PhotoFitMode.fit.rawValue,
             "shuffle": true,
             "photoSource": PhotoSource.photosLibrary.rawValue,
+            "kenBurns": false,
         ])
 
         interval = defaults.double(forKey: "interval")
@@ -78,5 +84,6 @@ final class AppSettings {
         shuffle = defaults.bool(forKey: "shuffle")
         photoSource = PhotoSource(rawValue: defaults.string(forKey: "photoSource") ?? "") ?? .photosLibrary
         customFolderPath = defaults.string(forKey: "customFolderPath")
+        kenBurns = defaults.bool(forKey: "kenBurns")
     }
 }

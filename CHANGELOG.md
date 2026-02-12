@@ -1,5 +1,23 @@
 # Changelog
 
+## [2026-02-12]
+
+### Added
+- Ken Burns effect toggle — photos slowly zoom and pan during display
+- Slide Down and Zoom transition effects
+- Interval slider now restarts timer immediately when changed
+
+### Changed
+- Minimum interval increased from 1s to 3s for better viewing experience
+- Transition duration proportional to interval: `min(1.0, interval × 0.3)`
+- Two-layer alternating architecture for seamless photo transitions
+  - Each layer has independent Ken Burns and transition animations
+  - Eliminates jitter and jumps during photo switches
+
+### Fixed
+- Slide transitions now properly animate both incoming and outgoing photos
+- Ken Burns no longer jumps or reverses direction mid-animation
+
 ## [2026-02-10] v1.0.0 — Open Source Release
 
 ### Added

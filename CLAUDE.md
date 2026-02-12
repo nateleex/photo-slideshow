@@ -34,6 +34,9 @@ resources/      - Info.plist, entitlements
 - Photo sources: system Photos library (PhotoKit) or custom folder (recursive file scan)
 - Random shuffle without repeats until all photos shown
 - Preloads next photo for instant transitions
+- Two-layer alternating architecture: layers A/B with independent Ken Burns and transition animations
+- Transitions: fade, slide (left/right/up/down), zoom, none — driven by direct @State animation
+- Ken Burns: random zoom in/out with linear 8s animation per layer
 - Hover reveals: traffic light buttons (fade animation), window border, bottom controls
 - Click anywhere to toggle play/pause
 - iCloud photos: network access allowed, failures auto-skipped

@@ -18,6 +18,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         state.loadInitialSource()
 
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(openSettings(_:)),
+            name: .openSettings, object: nil
+        )
+
         // Escape closes window (not quit)
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             if event.keyCode == 53 { // Escape
