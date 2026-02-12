@@ -97,6 +97,7 @@ final class MenuBarManager {
             backing: .buffered,
             defer: false
         )
+        window.isReleasedWhenClosed = false
         window.title = "Settings"
         window.contentView = hostingView
         window.center()
