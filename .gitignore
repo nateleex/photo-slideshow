@@ -6,3 +6,9 @@ build/
 *.xcworkspace
 xcuserdata/
 DerivedData/
+
+# Internal dev files (not for public repo)
+CLAUDE.md
+PROGRESS.md
+REVIEW_*.md
+docs/product-description-zh.md
