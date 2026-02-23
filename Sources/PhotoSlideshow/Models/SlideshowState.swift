@@ -109,22 +109,34 @@ final class SlideshowState {
     }
 
     func loadFolder(path: String) {
-        let url = URL(fileURLWithPath: path)
-        let fm = FileManager.default
-        guard let enumerator = fm.enumerator(at: url, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) else { return }
-
-        let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "heic", "heif", "tiff", "tif", "bmp", "gif", "webp"]
-        var urls: [URL] = []
-        for case let fileURL as URL in enumerator {
-            if imageExtensions.contains(fileURL.pathExtension.lowercased()) {
-                urls.append(fileURL)
+        isLoading = true
+        let gen = loadGeneration
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let url = URL(fileURLWithPath: path)
+            let fm = FileManager.default
+            guard let enumerator = fm.enumerator(at: url, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) else {
+                DispatchQueue.main.async { self?.isLoading = false }
+                return
             }
-        }
 
-        folderImageURLs = urls.sorted { $0.path < $1.path }
-        photoCount = urls.count
-        if photoCount > 0 && currentImage == nil {
-            showNext()
+            let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "heic", "heif", "tiff", "tif", "bmp", "gif", "webp"]
+            var urls: [URL] = []
+            for case let fileURL as URL in enumerator {
+                if imageExtensions.contains(fileURL.pathExtension.lowercased()) {
+                    urls.append(fileURL)
+                }
+            }
+            urls.sort { $0.path < $1.path }
+
+            DispatchQueue.main.async {
+                guard let self, self.loadGeneration == gen else { return }
+                self.folderImageURLs = urls
+                self.photoCount = urls.count
+                self.isLoading = false
+                if self.photoCount > 0 && self.currentImage == nil {
+                    self.showNext()
+                }
+            }
         }
     }
 

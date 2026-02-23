@@ -36,8 +36,12 @@ final class WindowManager {
             object: panel,
             queue: .main
         ) { [weak self] _ in
-            self?.panel = nil
-            self?.closeObserver = nil
+            guard let self else { return }
+            if let observer = self.closeObserver {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            self.panel = nil
+            self.closeObserver = nil
         }
 
         panel.makeKeyAndOrderFront(nil)

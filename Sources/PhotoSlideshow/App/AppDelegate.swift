@@ -35,6 +35,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidBecomeActive(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
+        // Re-check Photos permission in case user granted it in System Settings
+        if state.needsAuthorization {
+            state.checkAuthorization()
+            if state.isAuthorized && !state.isPlaying {
+                state.play()
+            }
+        }
     }
 
     func applicationDidResignActive(_ notification: Notification) {
