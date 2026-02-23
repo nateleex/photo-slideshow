@@ -16,6 +16,8 @@ final class SlideshowState {
     private var assets: PHFetchResult<PHAsset>?
     private var folderImageURLs: [URL] = []
     private var usedIndices = Set<Int>()
+    private var history: [Int] = []
+    private var historyPosition = -1
     private var timer: Timer?
     private let settings = AppSettings.shared
     private let loader = PhotoLoader()
@@ -84,6 +86,8 @@ final class SlideshowState {
         currentIndex = -1
         photoCount = 0
         usedIndices.removeAll()
+        history.removeAll()
+        historyPosition = -1
         preloadedNext = nil
         preloadedNextIndex = nil
         consecutiveFailures = 0
@@ -142,10 +146,34 @@ final class SlideshowState {
     func showNext() {
         guard photoCount > 0 else { return }
 
+        // If we're browsing back in history, step forward through it
+        if historyPosition >= 0 && historyPosition < history.count - 1 {
+            historyPosition += 1
+            let index = history[historyPosition]
+            currentIndex = index
+            // Invalidate preloaded image since we're navigating history
+            preloadedNext = nil
+            preloadedNextIndex = nil
+            isLoading = true
+            let gen = loadGeneration
+            loadImage(at: index) { [weak self] image in
+                DispatchQueue.main.async {
+                    guard let self, self.loadGeneration == gen else { return }
+                    if let image {
+                        self.previousImage = self.currentImage
+                        self.currentImage = image
+                    }
+                    self.isLoading = false
+                }
+            }
+            return
+        }
+
         if let preloaded = preloadedNext, let idx = preloadedNextIndex {
             previousImage = currentImage
             currentImage = preloaded
             currentIndex = idx
+            appendToHistory(idx)
             preloadedNext = nil
             preloadedNextIndex = nil
             consecutiveFailures = 0
@@ -164,6 +192,7 @@ final class SlideshowState {
                 if let image {
                     self.previousImage = self.currentImage
                     self.currentImage = image
+                    self.appendToHistory(index)
                     self.consecutiveFailures = 0
                 } else {
                     self.consecutiveFailures += 1
@@ -182,9 +211,14 @@ final class SlideshowState {
 
     func showPrevious() {
         guard photoCount > 0 else { return }
-        var index = currentIndex - 1
-        if index < 0 { index = photoCount - 1 }
+        guard historyPosition > 0 else { return }
+
+        historyPosition -= 1
+        let index = history[historyPosition]
         currentIndex = index
+        // Invalidate preloaded image since we're navigating history
+        preloadedNext = nil
+        preloadedNextIndex = nil
         isLoading = true
         let gen = loadGeneration
 
@@ -212,6 +246,21 @@ final class SlideshowState {
             guard let assets, index < assets.count else { completion(nil); return }
             let asset = assets.object(at: index)
             loader.loadImage(for: asset, targetSize: CGSize(width: 1920, height: 1080), completion: completion)
+        }
+    }
+
+    private func appendToHistory(_ index: Int) {
+        // If we navigated back and then went forward with a new photo,
+        // discard the forward history beyond current position
+        if historyPosition < history.count - 1 {
+            history.removeSubrange((historyPosition + 1)...)
+        }
+        history.append(index)
+        historyPosition = history.count - 1
+        // Cap history size to avoid unbounded memory growth
+        if history.count > 500 {
+            history.removeFirst(100)
+            historyPosition -= 100
         }
     }
 
