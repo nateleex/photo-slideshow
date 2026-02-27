@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026-02-24]
+
+### Fixed
+- Previous button now navigates to the actual last viewed photo (history stack instead of index decrement, fixes incorrect behavior in shuffle mode)
+- Photos Library auth refreshed on app activate to handle permission changes while app is running
+- Hardened async folder loading against race conditions
+
 ## [2026-02-12]
 
 ### Added

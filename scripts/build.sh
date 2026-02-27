@@ -13,19 +13,21 @@ rm -rf "$APP_BUNDLE"
 mkdir -p "$MACOS" "$RESOURCES"
 
 # Fix SwiftBridging module redefinition by creating a VFS overlay
-# that hides the duplicate bridging.modulemap
-OVERLAY_DIR="$BUILD_DIR/vfs"
-mkdir -p "$OVERLAY_DIR"
+# that hides the duplicate bridging.modulemap (CLT-specific issue)
 SWIFT_INCLUDE="/Library/Developer/CommandLineTools/usr/include/swift"
+VFS_FLAGS=""
 
-# Create a fixed module.modulemap that doesn't conflict
-cp "$SWIFT_INCLUDE/module.modulemap" "$OVERLAY_DIR/module.modulemap"
-# Create empty bridging.modulemap to prevent redefinition
-cat > "$OVERLAY_DIR/bridging.modulemap" << 'MODMAP'
+if [[ -f "$SWIFT_INCLUDE/bridging.modulemap" ]]; then
+    echo "==> Creating VFS overlay (CLT bridging.modulemap workaround)..."
+    OVERLAY_DIR="$BUILD_DIR/vfs"
+    mkdir -p "$OVERLAY_DIR"
+
+    cp "$SWIFT_INCLUDE/module.modulemap" "$OVERLAY_DIR/module.modulemap"
+    cat > "$OVERLAY_DIR/bridging.modulemap" << 'MODMAP'
 // intentionally empty - SwiftBridging defined in module.modulemap
 MODMAP
 
-cat > "$BUILD_DIR/vfs-overlay.yaml" << YAML
+    cat > "$BUILD_DIR/vfs-overlay.yaml" << YAML
 {
   "version": 0,
   "case-sensitive": "false",
@@ -44,6 +46,8 @@ cat > "$BUILD_DIR/vfs-overlay.yaml" << YAML
   ]
 }
 YAML
+    VFS_FLAGS="-Xfrontend -vfsoverlay -Xfrontend $BUILD_DIR/vfs-overlay.yaml"
+fi
 
 echo "==> Compiling..."
 cd "$PROJECT_DIR"
@@ -57,7 +61,7 @@ swiftc \
     -framework AppKit \
     -framework SwiftUI \
     -framework Photos \
-    -Xfrontend -vfsoverlay -Xfrontend "$BUILD_DIR/vfs-overlay.yaml" \
+    $VFS_FLAGS \
     -o "$MACOS/PhotoSlideshow" \
     $SOURCES \
     2>&1
