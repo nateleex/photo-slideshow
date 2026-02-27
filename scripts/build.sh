@@ -17,7 +17,7 @@ mkdir -p "$MACOS" "$RESOURCES"
 SWIFT_INCLUDE="/Library/Developer/CommandLineTools/usr/include/swift"
 VFS_FLAGS=""
 
-if [[ -f "$SWIFT_INCLUDE/bridging.modulemap" ]]; then
+if [[ -f "$SWIFT_INCLUDE/bridging.modulemap" && -f "$SWIFT_INCLUDE/module.modulemap" ]]; then
     echo "==> Creating VFS overlay (CLT bridging.modulemap workaround)..."
     OVERLAY_DIR="$BUILD_DIR/vfs"
     mkdir -p "$OVERLAY_DIR"
