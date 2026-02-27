@@ -1,11 +1,15 @@
 # Changelog
 
-## [2026-02-24]
+## [2026-02-27] v1.1.0
+
+### Added
+- GitHub Actions release workflow: auto build + publish on version tag push
 
 ### Fixed
 - Previous button now navigates to the actual last viewed photo (history stack instead of index decrement, fixes incorrect behavior in shuffle mode)
 - Photos Library auth refreshed on app activate to handle permission changes while app is running
 - Hardened async folder loading against race conditions
+- build.sh VFS overlay now conditional (CI compatibility)
 
 ## [2026-02-12]
 

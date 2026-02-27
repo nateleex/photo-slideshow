@@ -70,6 +70,15 @@ echo "==> Assembling app bundle..."
 cp "$PROJECT_DIR/resources/Info.plist" "$CONTENTS/Info.plist"
 cp "$PROJECT_DIR/resources/AppIcon.icns" "$RESOURCES/AppIcon.icns"
 
+# Inject version from git tag (e.g. v1.1.0 -> 1.1.0)
+VERSION=$(git -C "$PROJECT_DIR" describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
+if [[ -n "$VERSION" ]]; then
+    echo "==> Setting version to $VERSION"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$CONTENTS/Info.plist"
+    BUILD_NUM=$(git -C "$PROJECT_DIR" rev-list "$(git -C "$PROJECT_DIR" describe --tags --abbrev=0)"..HEAD --count 2>/dev/null || echo "0")
+    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUM" "$CONTENTS/Info.plist"
+fi
+
 echo "==> Ad-hoc signing..."
 codesign --force --sign - \
     --entitlements "$PROJECT_DIR/resources/PhotoSlideshow.entitlements" \
